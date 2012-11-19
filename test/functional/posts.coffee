@@ -182,6 +182,8 @@ describe "Posts", ->
           res.body.should.have.property "_id", "509e8743159227186b0ec460"
           res.body.should.have.property "title", "Hola, world!"
           res.body.should.have.property "body", "Heya!"
+          res.body.should.have.property "comments"
+          res.body.comments.should.be.a "object"
 
           done()
 
