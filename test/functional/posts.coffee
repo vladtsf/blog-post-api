@@ -23,7 +23,7 @@ describe "Posts", ->
           res.body.should.have.property "offset", 0
           res.body.should.have.property "limit"
           res.body.should.have.property "count"
-          # res.body.have.property( "posts" )
+          res.body.have.property( "posts" )
 
           done()
 
