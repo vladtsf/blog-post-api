@@ -3,21 +3,17 @@
   "version": "0.0.1",
   "scripts": {
     "start": "node app",
-    "test": "./node_modules/mocha/bin/mocha --ui bdd --timeout 5000 --slow 500 --compilers coffee:coffee-script --colors --reporter spec test/functional/*.coffee --require should --require test/helpers.coffee",
-    "deploy": "git push heroku `git rev-parse --abbrev-ref HEAD`:master"
+    "test": "./node_modules/mocha/bin/mocha --ui bdd --timeout 5000 --slow 500 --compilers coffee:coffee-script --colors --reporter spec test/functional/*.coffee --require should --require test/helpers.coffee"
   },
   "dependencies": {
-    "coffee-script": "*",
-    "underscore": "*",
-    "backbone": "*",
-    "backbone-validation": "*",
-    "express-namespace": "*",
+    "coffee-script": "1.4.0",
+    "express-namespace": "0.1.1",
     "mongoose": "3.1.2",
     "express": "3.0.1",
-    "async": "*",
-    "supertest": "*",
-    "mocha": "*",
-    "should": "*"
+    "async": "0.1.22",
+    "supertest": "0.4.2",
+    "mocha": "1.7.0",
+    "should": "1.2.1"
   },
   "devDependencies": {
   },
