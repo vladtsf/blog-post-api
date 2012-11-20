@@ -2,7 +2,6 @@ class PostsController
   Post = require "../models/post"
   Comment = require "../models/comment"
   async = require "async"
-  mongoose = require "mongoose"
 
   initialize: ->
 
@@ -42,6 +41,11 @@ class PostsController
 
   #
   # Show the post
+  #
+  # Unfortunately, nested population not yet implemented in Mongoose
+  # (proof: https://github.com/LearnBoost/mongoose/issues/601)
+  # So, I decided to limit to two levels of nesting,
+  # because it isnt production code
   #
   # @example: {
   #   _id: 10,
@@ -100,7 +104,27 @@ class PostsController
   # }
   #
   remove: ( req, res ) ->
-    res.send( 404 )
+    Post
+      .findOne( _id: req.route.params.id )
+      .populate( "comments" )
+      .exec ( err, post ) =>
+        if err
+          res.json 503, success: off
+        else unless post
+          res.json 404, success: off
+        else
+          tasks = for own comment in post.comments
+            do ( comment ) ->
+              ( callback ) -> comment.remove( callback )
+
+          tasks.push ( callback ) -> post.remove( callback )
+
+          async.parallel tasks, ( err, results ) =>
+            if err
+              res.json 503, success: off
+            else
+              res.json success: on
+
 
   #
   # Creates a comment

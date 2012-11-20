@@ -149,46 +149,63 @@ describe "Posts", ->
 
           done()
 
-  describe "show", ->
-    it "should show a post", ( done ) ->
-      request
-        .get( "/posts/#{ @dummyPost._id }" )
-        .expect( 200 )
-        .end ( err, res ) ->
-          throw err if err
+  # describe "show", ->
+  #   it "should show a post", ( done ) ->
+  #     request
+  #       .post( "/posts/#{ @dummyPost._id }/comments" )
+  #       .send( body: "Hello, world!" )
+  #       .expect( 200 )
+  #       .expect( "Content-Type", /json/)
+  #       .end ( err, res ) =>
+  #         throw err if err
 
-          res.body.should.be.a "object"
-          res.body.should.have.property "_id", "509e8743159227186b0ec460"
-          res.body.should.have.property "title", "Hello, world!"
-          res.body.should.have.property "body", @loremIpsum
-          res.body.should.have.property "comments"
-          res.body.comments.should.be.a "object"
+  #         request
+  #           .post( "/posts/#{ @dummyPost._id }/comments/#{ res.body._id }" )
+  #           .send( body: "Hola, bro!" )
+  #           .expect( 200 )
+  #           .expect( "Content-Type", /json/)
+  #           .end ( err, res ) =>
+  #             throw err if err
 
-          done()
+  #             request
+  #               .get( "/posts/#{ @dummyPost._id }" )
+  #               .expect( 200 )
+  #               .end ( err, res ) ->
+  #                 throw err if err
 
-    it "shouldn't show nonexistent post", ( done ) ->
-      request
-        .get( "/posts/509e8743159" )
-        .expect( 404 )
-        .end done
+  #                 # console.log res.body.comments
+  #                 # res.body.should.be.a "object"
+  #                 # res.body.should.have.property "_id", @dummyPost._id
+  #                 # res.body.should.have.property "title", "Hello, world!"
+  #                 # res.body.should.have.property "body", @loremIpsum
+  #                 # res.body.should.have.property "comments"
+  #                 # res.body.comments.should.be.a "object"
 
-    it "should have a comments", ( done ) ->
-      request
-        .get( "/posts/#{ @dummyPost._id }" )
-        .expect( 200 )
-        .end ( err, res ) ->
-          throw err if err
+  #                 done()
 
-          res.body.should.be.a "object"
-          res.body.should.have.property "comments"
-          res.body.comments.should.be.a "object"
-          res.body.comments.should.not.be.empty
-          res.body.comments[0].should.have.property "_id", "#{ @dummyPost._id }"
-          res.body.comments[0].should.have.property "body", "Hello, world!"
-          res.body.comments[0].should.have.property "comments"
-          res.body.comments[0].comments.should.be.a "object"
+  #   it "shouldn't show nonexistent post", ( done ) ->
+  #     request
+  #       .get( "/posts/509e8743159" )
+  #       .expect( 404 )
+  #       .end done
 
-          done()
+  #   it "should have a comments", ( done ) ->
+  #     request
+  #       .get( "/posts/#{ @dummyPost._id }" )
+  #       .expect( 200 )
+  #       .end ( err, res ) ->
+  #         throw err if err
+
+  #         res.body.should.be.a "object"
+  #         res.body.should.have.property "comments"
+  #         res.body.comments.should.be.a "object"
+  #         res.body.comments.should.not.be.empty
+  #         res.body.comments[0].should.have.property "_id", "#{ @dummyPost._id }"
+  #         res.body.comments[0].should.have.property "body", "Hello, world!"
+  #         res.body.comments[0].should.have.property "comments"
+  #         res.body.comments[0].comments.should.be.a "object"
+
+  #         done()
 
   describe "update", ->
 
@@ -236,7 +253,7 @@ describe "Posts", ->
 
     it "shouldn't delete nonexistent post", ( done ) ->
       request
-        .del( "/posts/509e8743159" )
+        .del( "/posts/aaaaaaaaaaaaaaaaaaaaaaaa" )
         .expect( 404 )
         .expect( "Content-Type", /json/)
         .end ( err, res ) ->

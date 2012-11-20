@@ -1,4 +1,5 @@
 mongoose = require "mongoose"
+async = require "async"
 
 schema = new mongoose.Schema
   body:
@@ -18,5 +19,16 @@ schema.pre "remove", ( next ) ->
     .where( "_id" ).in( @comments )
     .remove()
     .exec( next )
+
+schema.methods.loadThread = ( callback = -> ) ->
+  Comment
+    .find()
+    .where( "_id" ).in( @comments )
+    .populate( "comments" )
+    .exec ( err, comments ) =>
+      @set( "comments", comments )
+      # @comments = comments
+      console.log JSON.stringify( @ )
+      callback( err )
 
 module.exports = Comment = mongoose.model "Comment", schema
