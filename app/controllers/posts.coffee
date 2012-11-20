@@ -33,7 +33,7 @@ class PostsController
           .limit( limit )
           .exec ( err, posts ) ->
             if err
-              res.send 504
+              res.send 503
             else
               res.json { offset, limit, count, posts }
 
@@ -86,7 +86,7 @@ class PostsController
     post = new Post( { title, body } = req.body )
     post.save ( err, post ) ->
       if err
-        res.send 504
+        res.send 503
       else
         res.json { _id, title, body, comments } = post
 
@@ -110,7 +110,44 @@ class PostsController
   # }
   #
   createComment: ( req, res ) ->
-    res.send( 404 )
+    { post: postId, parent: parentId } = req.route.params
+
+    # @todo: refactor to async
+    # find a post
+    Post
+      .findOne( _id: postId )
+      .exec ( err, post ) =>
+        if err
+          res.send 503
+        else unless post
+          res.send 404
+        else
+          # Create a comment
+          new Comment( body: req.body.body ).save ( err, comment ) =>
+            if err
+              res.send 503
+            else
+              unless parentId
+                post.update { $addToSet: { comments : comment._id } }, ( err, numAffected ) =>
+                  if err
+                    res.send 503
+                  else
+                    res.json { _id, body, comments } = comment
+              else
+                Comment
+                  .findOne( _id: parentId )
+                  .exec ( err, parentComment ) =>
+                    if err
+                      res.send 503
+                    else unless parentComment
+                      comment.remove ( err ) =>
+                        res.send unless err then 404 else 503
+                    else
+                      parentComment.update { $addToSet: { comments : comment._id } }, ( err, numAffected ) =>
+                        if err
+                          res.send 503
+                        else
+                          res.json { _id, body, comments } = comment
 
   #
   # Removes a comment
