@@ -2,6 +2,7 @@ class PostsController
   Post = require "../models/post"
   Comment = require "../models/comment"
   async = require "async"
+  mongoose = require "mongoose"
 
   initialize: ->
 
@@ -159,6 +160,60 @@ class PostsController
   # }
   #
   deleteComment: ( req, res ) ->
-    res.send( 404 )
+    { post:postId, id:commentId } = req.route.params
+
+    async.parallel [
+        ( callback ) =>
+          # find a post
+          Post
+            .findOne( _id: postId )
+            .exec( callback )
+        ( callback ) =>
+          # find a comment
+            Comment
+              .findOne( _id: commentId )
+              .exec( callback )
+        ( callback ) =>
+          # find parent comment
+            Comment
+              .findOne()
+              .where( "comments" ).in( [ commentId ] )
+              .exec( callback )
+    ], ( err, results ) =>
+      if err
+        res.send 503
+      else unless results[ 0 ] and results[ 1 ]
+        res.json 404, success: off
+      else
+        async.parallel [
+          ( callback ) =>
+            # remove comment from post
+            results[ 0 ]
+              .comments
+              .remove( commentId )
+
+            results[ 0 ].save( callback )
+
+          ( callback ) =>
+            return callback() unless results[ 2 ]
+
+            # remove comment from thread
+            results[ 2 ]
+              .comments
+              .remove( commentId )
+
+            results[ 2 ].save( callback )
+
+          ( callback ) =>
+            # remove comment
+            results[ 1 ].remove( callback )
+        ], ( err, actions ) =>
+          if err
+            res.send 503
+          else
+            res.json success: on
+
+
+    # Post.findOne(  )
 
 module.exports = PostsController

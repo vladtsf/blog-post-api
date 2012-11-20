@@ -9,4 +9,14 @@ schema = new mongoose.Schema
     ref: "Comment"
   ]
 
+# remove threads
+schema.pre "remove", ( next ) ->
+  return next() unless @comments.length
+
+  Comment
+    .find()
+    .where( "_id" ).in( @comments )
+    .remove()
+    .exec( next )
+
 module.exports = Comment = mongoose.model "Comment", schema

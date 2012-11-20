@@ -110,7 +110,7 @@ describe "Posts", ->
 
           done()
 
-    it "should be possible to remove comment", ( done ) ->
+    it "should be possible to remove threaded comment", ( done ) ->
       request
         .del( "/posts/#{ @dummyPost._id }/comments/#{ @dummyThreadedComment._id }" )
         .expect( 200 )
@@ -123,9 +123,22 @@ describe "Posts", ->
 
           done()
 
+    it "should be possible to remove comment", ( done ) ->
+      request
+        .del( "/posts/#{ @dummyPost._id }/comments/#{ @dummyComment._id }" )
+        .expect( 200 )
+        .expect( "Content-Type", /json/)
+        .end ( err, res ) ->
+          throw err if err
+
+          res.body.should.be.a "object"
+          res.body.success.should.be.true
+
+          done()
+
     it "shouldn't be possible to remove nonexistent comment", ( done ) ->
       request
-        .del( "/posts/#{ @dummyPost._id }/comments/509e8743159227" )
+        .del( "/posts/#{ @dummyPost._id }/comments/aaaaaaaaaaaaaaaaaaaaaaaa" )
         .expect( 404 )
         .expect( "Content-Type", /json/)
         .end ( err, res ) ->
