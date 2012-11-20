@@ -1,4 +1,6 @@
 class PostsController
+  Post = require "../models/post"
+  Comment = require "../models/comment"
 
   initialize: ->
 
@@ -17,6 +19,24 @@ class PostsController
   # }
   #
   list: ( req, res ) ->
+    offset = parseInt( req.query.offset ) || 0
+    limit = parseInt( req.query.limit ) || 10
+
+    Post
+      .count()
+      .exec ( err, count ) ->
+        Post
+          .find()
+          .select( "_id title body" )
+          .sort( "-_id" )
+          .skip( offset )
+          .limit( limit )
+          .exec ( err, posts ) ->
+            if err
+              res.send 504
+            else
+              res.json { offset, limit, count, posts }
+
 
   #
   # Show the post
@@ -33,6 +53,7 @@ class PostsController
   # }
   #
   show: ( req, res ) ->
+    res.send( 404 )
 
   #
   # Updates the post
@@ -49,6 +70,7 @@ class PostsController
   # }
   #
   update: ( req, res ) ->
+    res.send( 404 )
 
   #
   # Creates a post
@@ -61,6 +83,7 @@ class PostsController
   # }
   #
   create: ( req, res ) ->
+    res.send( 404 )
 
   #
   # Removes a post
@@ -70,6 +93,7 @@ class PostsController
   # }
   #
   remove: ( req, res ) ->
+    res.send( 404 )
 
   #
   # Creates a comment
@@ -81,6 +105,7 @@ class PostsController
   # }
   #
   createComment: ( req, res ) ->
+    res.send( 404 )
 
   #
   # Removes a comment
@@ -90,5 +115,6 @@ class PostsController
   # }
   #
   deleteComment: ( req, res ) ->
+    res.send( 404 )
 
 module.exports = PostsController
