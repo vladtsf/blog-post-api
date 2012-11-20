@@ -83,7 +83,12 @@ class PostsController
   # }
   #
   create: ( req, res ) ->
-    res.send( 404 )
+    post = new Post( { title, body } = req.body )
+    post.save ( err, post ) ->
+      if err
+        res.send 504
+      else
+        res.json { _id, title, body, comments } = post
 
   #
   # Removes a post
