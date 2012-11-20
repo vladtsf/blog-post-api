@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "start": "node app",
-    "test": "./node_modules/mocha/bin/mocha --ui bdd --timeout 2000 --compilers coffee:coffee-script --colors --reporter spec test/functional/*.coffee --require should --require test/helpers.coffee",
+    "test": "./node_modules/mocha/bin/mocha --ui bdd --timeout 5000 --compilers coffee:coffee-script --colors --reporter spec test/functional/*.coffee --require should --require test/helpers.coffee",
     "deploy": "git push heroku `git rev-parse --abbrev-ref HEAD`:master"
   },
   "dependencies": {
