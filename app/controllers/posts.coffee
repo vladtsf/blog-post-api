@@ -59,7 +59,24 @@ class PostsController
   # }
   #
   show: ( req, res ) ->
-    res.send( 404 )
+    Post
+      .findOne( _id: req.route.params.id )
+      .exec ( err, post ) =>
+        if err
+          res.send 503
+        else unless post
+          res.send 404
+        else
+          { _id, body, title } = post
+
+          Comment
+            .find()
+            .where( "_id" ).in( post.comments )
+            .populate( "comments" )
+            .exec ( err, comments ) =>
+              return res.send( 503 ) if err
+
+              res.json { _id, body, title, comments }
 
   #
   # Updates the post
