@@ -1,6 +1,7 @@
 class PostsController
   Post = require "../models/post"
   Comment = require "../models/comment"
+  async = require "async"
 
   initialize: ->
 
@@ -112,42 +113,43 @@ class PostsController
   createComment: ( req, res ) ->
     { post: postId, parent: parentId } = req.route.params
 
-    # @todo: refactor to async
-    # find a post
-    Post
-      .findOne( _id: postId )
-      .exec ( err, post ) =>
-        if err
-          res.send 503
-        else unless post
-          res.send 404
-        else
-          # Create a comment
-          new Comment( body: req.body.body ).save ( err, comment ) =>
-            if err
-              res.send 503
+    async.parallel [
+        ( callback ) =>
+          # find a post
+          Post
+            .findOne( _id: postId )
+            .exec( callback )
+        ( callback ) =>
+          # find a parent comment
+          if parentId
+            Comment
+              .findOne( _id: parentId )
+              .exec( callback )
+          else
+            callback()
+    ], ( err, results ) =>
+      if err
+        res.send 503
+      if not results[ 0 ]
+        # no posts found
+        res.send 404
+      else
+        new Comment( body: req.body.body ).save ( err, comment ) =>
+          if err
+            res.send 503
+          else
+            unless parentId
+              results[ 0 ].update { $addToSet: { comments : comment._id } }, ( err, numAffected ) =>
+                if err
+                  res.send 503
+                else
+                  res.json { _id, body, comments } = comment
             else
-              unless parentId
-                post.update { $addToSet: { comments : comment._id } }, ( err, numAffected ) =>
-                  if err
-                    res.send 503
-                  else
-                    res.json { _id, body, comments } = comment
-              else
-                Comment
-                  .findOne( _id: parentId )
-                  .exec ( err, parentComment ) =>
-                    if err
-                      res.send 503
-                    else unless parentComment
-                      comment.remove ( err ) =>
-                        res.send unless err then 404 else 503
-                    else
-                      parentComment.update { $addToSet: { comments : comment._id } }, ( err, numAffected ) =>
-                        if err
-                          res.send 503
-                        else
-                          res.json { _id, body, comments } = comment
+              results[ 1 ].update { $addToSet: { comments : comment._id } }, ( err, numAffected ) =>
+                if err
+                  res.send 503
+                else
+                  res.json { _id, body, comments } = comment
 
   #
   # Removes a comment
