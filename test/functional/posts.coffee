@@ -218,7 +218,7 @@ describe "Posts", ->
         )
         .expect( 200 )
         .expect( "Content-Type", /json/)
-        .end ( err, res ) ->
+        .end ( err, res ) =>
           throw err if err
 
           res.body.should.be.a "object"
@@ -232,7 +232,7 @@ describe "Posts", ->
 
     it "shouldn't update nonexistent post", ( done ) ->
       request
-        .put( "/posts/509e8743159" )
+        .put( "/posts/aaaaaaaaaaaaaaaaaaaaaaaa" )
         .expect( 404 )
         .end( done )
 

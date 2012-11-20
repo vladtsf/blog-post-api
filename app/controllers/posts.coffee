@@ -76,7 +76,21 @@ class PostsController
   # }
   #
   update: ( req, res ) ->
-    res.send( 404 )
+    Post
+      .findOne( _id: req.route.params.id )
+      .populate( "comments" )
+      .exec ( err, post ) =>
+        if err
+          res.send 503
+        else unless post
+          res.send 404
+        else
+          post.set( { title, body } = req.body )
+          post.save ( err ) =>
+            return res.send( 503 ) if err
+
+            res.json( post )
+
 
   #
   # Creates a post
