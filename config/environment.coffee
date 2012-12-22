@@ -2,12 +2,13 @@ express = require("express")
 path    = require("path")
 fs      = require("fs")
 pkg     = require("../package.json")
+uuid    = require("node-uuid")
 
 module.exports = (app) ->
 
   app.configure "development", ->
     app.use express.errorHandler()
-    app.set "mongodb", "mongodb://testuser:7258cbbd2eb535757a0514b83c460f9e@alex.mongohq.com:10016/blog-posts-api"
+    app.set "mongodb", "mongodb://localhost/vtsvang-blog-posts-api-#{ uuid.v4() }"
 
   app.configure "production", ->
     app.set "mongodb", process.env.MONGODB
